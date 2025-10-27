@@ -1,0 +1,85 @@
+# Simple Network Packet Sniffer
+
+I (Shihab) prefer to start building cybersecurity projects from the core network layer because understanding raw network traffic is the foundation of offensive and defensive security  
+This project is a basic packet sniffer written in Python using **Scapy**  
+It listens to network interfaces and prints information about every packet that passes through
+
+## Features
+- Captures network packets in real time
+- Extracts source and destination IP addresses
+- Detects whether the packet uses TCP or UDP
+- Displays source and destination ports for TCP and UDP packets
+
+## Requirements
+Before running the script, make sure Scapy is installed
+
+```bash
+pip install scapy
+
+Depending on the system, it may require administrator or root privileges
+For Linux
+
+sudo python3 sniffer.py
+
+Code Explanation
+
+The script uses the sniff() function from Scapy to capture packets and pass them to a callback function
+Inside the callback, we check whether the packet contains IP headers
+If yes, we extract:
+
+Source IP
+
+Destination IP
+
+Protocol number
+
+
+Then we check if the packet is TCP or UDP, and extract ports accordingly
+
+Source Code
+
+from scapy.all import sniff, IP, TCP, UDP
+
+def packet_callback(packet):
+    if IP in packet:
+        ip_src = packet[IP].src
+        ip_dst = packet[IP].dst
+        proto = packet[IP].proto
+
+        print(f"\n[+] New Packet: {ip_src} -> {ip_dst} | Protocol: {proto}")
+
+        if TCP in packet:
+            sport = packet[TCP].sport
+            dport = packet[TCP].dport
+            print(f"    TCP  | Src Port: {sport} -> Dst Port: {dport}")
+
+        elif UDP in packet:
+            sport = packet[UDP].sport
+            dport = packet[UDP].dport
+            print(f"    UDP  | Src Port: {sport} -> Dst Port: {dport}")
+
+sniff(prn=packet_callback, store=False)
+
+Notes
+
+The protocol number refers to the OSI Layer 3 protocol type
+
+TCP and UDP detection is handled by checking layer presence
+
+Can be extended later to include:
+
+Logging to file
+
+Filtering packets by port or IP
+
+Adding color output for better readability
+
+
+
+Future Enhancements (Roadmap)
+
+Add packet filtering options using filter argument in sniff()
+
+Write captured packet metadata to JSON files
+
+Build GUI version using Tkinter or PyQt
